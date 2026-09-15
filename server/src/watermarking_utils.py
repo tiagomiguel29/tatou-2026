@@ -43,14 +43,15 @@ from watermarking_method import (
 )
 from add_after_eof import AddAfterEOF
 from unsafe_bash_bridge_append_eof import UnsafeBashBridgeAppendEOF
-
+from metadata_hmac import MetadataHMAC
 # --------------------
 # Method registry
 # --------------------
 
 METHODS: Dict[str, WatermarkingMethod] = {
     AddAfterEOF.name: AddAfterEOF(),
-    UnsafeBashBridgeAppendEOF.name: UnsafeBashBridgeAppendEOF()
+    UnsafeBashBridgeAppendEOF.name: UnsafeBashBridgeAppendEOF(),
+    MetadataHMAC.name: MetadataHMAC(),
 }
 """Registry of available watermarking methods.
 
