@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git ca-certificates openssh-client \
+ && apt-get install -y --no-install-recommends git ca-certificates openssh-client gnupg \
  && rm -rf /var/lib/apt/lists/*
 
 # Copy project description, to instal dependencies
@@ -18,6 +18,7 @@ RUN pip install --no-cache-dir -e .
 
 # Copy sources after dependencies installation
 COPY src /app/src
+COPY rmap-keys /app/rmap-keys
 COPY flag /app/flag
 COPY entrypoint.sh /app/entrypoint.sh
 RUN pip install --no-cache-dir -e .

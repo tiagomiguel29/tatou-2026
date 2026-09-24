@@ -1,6 +1,10 @@
 import os
 import io
 import hashlib
+import json
+import base64
+import secrets
+import subprocess
 import datetime as dt
 from pathlib import Path
 from functools import wraps
@@ -13,11 +17,6 @@ from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import IntegrityError
 
-import pickle as _std_pickle
-try:
-    import dill as _pickle  # allows loading classes not importable by module path
-except Exception:  # dill is optional
-    _pickle = _std_pickle
 
 
 import watermarking_utils as WMUtils
@@ -84,6 +83,240 @@ def create_app():
             for chunk in iter(lambda: f.read(1024 * 1024), b""):
                 h.update(chunk)
         return h.hexdigest()
+
+    # --- RMAP helpers ---
+    app.config["RMAP_GPG_HOME"] = os.environ.get(
+        "RMAP_GPG_HOME", "/app/rmap-gnupg"
+    )
+
+    # RMAP handshake state: nonceServer -> authenticated identity/nonceClient.
+    # Gunicorn currently runs with its default single worker.
+    app.config["RMAP_SESSIONS"] = {}
+
+    def _rmap_decode_payload(payload):
+        if not isinstance(payload, str) or not payload:
+            raise ValueError("payload must be a non-empty string")
+        try:
+            armored = base64.b64decode(payload, validate=True)
+        except Exception as e:
+            raise ValueError(f"invalid base64 payload: {e}") from e
+        if not armored.startswith(b"-----BEGIN PGP MESSAGE-----"):
+            raise ValueError("payload is not an ASCII-armored GPG message")
+        return armored
+
+    def _rmap_recipient_for_identity(identity):
+        if not isinstance(identity, str) or not identity:
+            raise ValueError("identity must be a non-empty string")
+
+        try:
+            proc = subprocess.run(
+                [
+                    "gpg",
+                    "--batch",
+                    "--with-colons",
+                    "--homedir", app.config["RMAP_GPG_HOME"],
+                    "--list-keys",
+                    identity,
+                ],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False,
+            )
+        except Exception as e:
+            raise RuntimeError(f"GPG identity lookup failed: {e}") from e
+
+        if proc.returncode != 0:
+            raise ValueError("unknown identity")
+
+        fingerprints = []
+        for line in proc.stdout.splitlines():
+            fields = line.split(":")
+            if len(fields) > 9 and fields[0] == "fpr":
+                fingerprints.append(fields[9])
+
+        if not fingerprints:
+            raise ValueError("identity has no valid public key")
+
+        return fingerprints[0]
+
+
+    def _rmap_decrypt(payload):
+        armored = _rmap_decode_payload(payload)
+
+        try:
+            proc = subprocess.run(
+                [
+                    "gpg",
+                    "--batch",
+                    "--pinentry-mode", "loopback",
+                    "--homedir", app.config["RMAP_GPG_HOME"],
+                    "--passphrase-file",
+                    os.path.join(app.config["RMAP_GPG_HOME"], "passphrase"),
+                    "--decrypt",
+                ],
+                input=armored,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+        except Exception as e:
+            raise RuntimeError(f"GPG execution failed: {e}") from e
+
+        if proc.returncode != 0:
+            raise ValueError("GPG decryption failed")
+
+        try:
+            obj = json.loads(proc.stdout.decode("utf-8"))
+        except Exception as e:
+            raise ValueError("decrypted payload is not valid JSON") from e
+
+        if not isinstance(obj, dict):
+            raise ValueError("decrypted payload must be a JSON object")
+
+        return obj
+
+    def _rmap_encrypt(obj, recipient):
+        plaintext = json.dumps(
+            obj,
+            separators=(",", ":"),
+            ensure_ascii=False,
+        ).encode("utf-8")
+
+        try:
+            proc = subprocess.run(
+                [
+                    "gpg",
+                    "--batch",
+                    "--yes",
+                    "--armor",
+                    "--homedir", app.config["RMAP_GPG_HOME"],
+                    "--trust-model", "always",
+                    "--encrypt",
+                    "--recipient", recipient,
+                ],
+                input=plaintext,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                check=False,
+            )
+        except Exception as e:
+            raise RuntimeError(f"GPG execution failed: {e}") from e
+
+        if proc.returncode != 0:
+            raise RuntimeError("GPG encryption failed")
+
+        return base64.b64encode(proc.stdout).decode("ascii")
+
+    @app.post("/api/rmap-get-link")
+    def rmap_get_link():
+        payload = (request.get_json(silent=True) or {}).get("payload")
+
+        try:
+            data = _rmap_decrypt(payload)
+            nonce_server = data.get("nonceServer")
+
+            if (
+                not isinstance(nonce_server, int)
+                or not 0 <= nonce_server <= 0xFFFFFFFFFFFFFFFF
+            ):
+                return jsonify({"error": "invalid nonceServer"}), 400
+
+            session = app.config["RMAP_SESSIONS"].pop(nonce_server, None)
+            if session is None:
+                return jsonify({"error": "unknown nonceServer"}), 400
+
+            nonce_client = session["nonceClient"]
+            recipient = session["recipient"]
+
+            result = f"{nonce_client:016x}{nonce_server:016x}"
+
+            # Bind this authenticated RMAP handshake to the group's
+            # watermarked PDF through the existing Versions table.
+            rmap_pdf = Path(
+                "/app/storage/files/phase0test/watermarks/"
+                "Group_22__Group-22-Test.pdf"
+            )
+
+            if not rmap_pdf.exists():
+                return jsonify({"error": "RMAP document unavailable"}), 503
+
+            try:
+                with get_engine().begin() as conn:
+                    conn.execute(
+                        text("""
+                            INSERT INTO Versions
+                                (documentid, link, intended_for, secret, method, position, path)
+                            VALUES
+                                (:documentid, :link, :intended_for, :secret, :method, :position, :path)
+                        """),
+                        {
+                            "documentid": 2,
+                            "link": result,
+                            "intended_for": session["identity"],
+                            "secret": "rmap-existing-watermark",
+                            "method": "metadata-hmac",
+                            "position": "",
+                            "path": str(rmap_pdf),
+                        },
+                    )
+            except Exception as e:
+                return jsonify({"error": f"RMAP version creation failed: {e}"}), 503
+
+            response_payload = _rmap_encrypt(
+                {"result": result},
+                recipient,
+            )
+
+            return jsonify({"payload": response_payload}), 200
+
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except RuntimeError as e:
+            return jsonify({"error": str(e)}), 500
+
+
+    @app.post("/api/rmap-initiate")
+    def rmap_initiate():
+        payload = (request.get_json(silent=True) or {}).get("payload")
+
+        try:
+            data = _rmap_decrypt(payload)
+
+            nonce_client = data.get("nonceClient")
+            identity = data.get("identity")
+
+            if (
+                not isinstance(nonce_client, int)
+                or not 0 <= nonce_client <= 0xFFFFFFFFFFFFFFFF
+            ):
+                return jsonify({"error": "invalid nonceClient"}), 400
+
+            recipient = _rmap_recipient_for_identity(identity)
+
+            nonce_server = secrets.randbits(64)
+
+            app.config["RMAP_SESSIONS"][nonce_server] = {
+                "nonceClient": nonce_client,
+                "identity": identity,
+                "recipient": recipient,
+            }
+
+            response_payload = _rmap_encrypt(
+                {
+                    "nonceClient": nonce_client,
+                    "nonceServer": nonce_server,
+                },
+                recipient,
+            )
+
+            return jsonify({"payload": response_payload}), 200
+
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except RuntimeError as e:
+            return jsonify({"error": str(e)}), 500
+
 
     # --- Routes ---
     
@@ -169,7 +402,9 @@ def create_app():
         if not file or file.filename == "":
             return jsonify({"error": "empty filename"}), 400
 
-        fname = file.filename
+        fname = secure_filename(file.filename)
+        if not fname:
+            return jsonify({"error": "invalid filename"}), 400
 
         user_dir = app.config["STORAGE_DIR"] / "files" / g.user["login"]
         user_dir.mkdir(parents=True, exist_ok=True)
@@ -659,70 +894,11 @@ def create_app():
     @app.post("/api/load-plugin")
     @require_auth
     def load_plugin():
-        """
-        Load a serialized Python class implementing WatermarkingMethod from
-        STORAGE_DIR/files/plugins/<filename>.{pkl|dill} and register it in wm_mod.METHODS.
-        Body: { "filename": "MyMethod.pkl", "overwrite": false }
-        """
-        payload = request.get_json(silent=True) or {}
-        filename = (payload.get("filename") or "").strip()
-        overwrite = bool(payload.get("overwrite", False))
-
-        if not filename:
-            return jsonify({"error": "filename is required"}), 400
-
-        # Locate the plugin in /storage/files/plugins (relative to STORAGE_DIR)
-        storage_root = Path(app.config["STORAGE_DIR"])
-        plugins_dir = storage_root / "files" / "plugins"
-        try:
-            plugins_dir.mkdir(parents=True, exist_ok=True)
-            plugin_path = plugins_dir / filename
-        except Exception as e:
-            return jsonify({"error": f"plugin path error: {e}"}), 500
-
-        if not plugin_path.exists():
-            return jsonify({"error": f"plugin file not found: {safe}"}), 404
-
-        # Unpickle the object (dill if available; else std pickle)
-        try:
-            with plugin_path.open("rb") as f:
-                obj = _pickle.load(f)
-        except Exception as e:
-            return jsonify({"error": f"failed to deserialize plugin: {e}"}), 400
-
-        # Accept: class object, or instance (we'll promote instance to its class)
-        if isinstance(obj, type):
-            cls = obj
-        else:
-            cls = obj.__class__
-
-        # Determine method name for registry
-        method_name = getattr(cls, "name", getattr(cls, "__name__", None))
-        if not method_name or not isinstance(method_name, str):
-            return jsonify({"error": "plugin class must define a readable name (class.__name__ or .name)"}), 400
-
-        # Validate interface: either subclass of WatermarkingMethod or duck-typing
-        has_api = all(hasattr(cls, attr) for attr in ("add_watermark", "read_secret"))
-        if WatermarkingMethod is not None:
-            is_ok = issubclass(cls, WatermarkingMethod) and has_api
-        else:
-            is_ok = has_api
-        if not is_ok:
-            return jsonify({"error": "plugin does not implement WatermarkingMethod API (add_watermark/read_secret)"}), 400
-            
-        # Register the class (not an instance) so you can instantiate as needed later
-        WMUtils.METHODS[method_name] = cls()
-        
         return jsonify({
-            "loaded": True,
-            "filename": filename,
-            "registered_as": method_name,
-            "class_qualname": f"{getattr(cls, '__module__', '?')}.{getattr(cls, '__qualname__', cls.__name__)}",
-            "methods_count": len(WMUtils.METHODS)
-        }), 201
-        
-    
-    
+            "error": "dynamic plugin loading is disabled for security reasons"
+        }), 410
+
+
     # GET /api/get-watermarking-methods -> {"methods":[{"name":..., "description":...}, ...], "count":N}
     @app.get("/api/get-watermarking-methods")
     def get_watermarking_methods():
