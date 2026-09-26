@@ -45,6 +45,7 @@ from dataclasses import dataclass
 from typing import IO, ClassVar, TypeAlias, Union
 import io
 import os
+#import pikepdf
 
 # ----------------------------
 # Public type aliases & errors

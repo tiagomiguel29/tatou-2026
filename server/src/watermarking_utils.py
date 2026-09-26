@@ -35,6 +35,8 @@ import io
 import json
 import os
 import re
+import pikepdf
+
 
 from watermarking_method import (
     PdfSource,
@@ -43,6 +45,7 @@ from watermarking_method import (
 )
 from add_after_eof import AddAfterEOF
 from unsafe_bash_bridge_append_eof import UnsafeBashBridgeAppendEOF
+from secret_in_producer import SecretInProducer
 
 # --------------------
 # Method registry
@@ -50,7 +53,8 @@ from unsafe_bash_bridge_append_eof import UnsafeBashBridgeAppendEOF
 
 METHODS: Dict[str, WatermarkingMethod] = {
     AddAfterEOF.name: AddAfterEOF(),
-    UnsafeBashBridgeAppendEOF.name: UnsafeBashBridgeAppendEOF()
+    UnsafeBashBridgeAppendEOF.name: UnsafeBashBridgeAppendEOF(),
+    SecretInProducer.name: SecretInProducer()
 }
 """Registry of available watermarking methods.
 
@@ -248,5 +252,5 @@ __all__ = [
     "read_watermark",
     "explore_pdf",
     "is_watermarking_applicable"
-]
+	]
 

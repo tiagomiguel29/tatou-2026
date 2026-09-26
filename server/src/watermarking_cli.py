@@ -33,6 +33,8 @@ import json
 import os
 import sys
 import getpass
+#import pikepdf
+import pymupdf as fitz
 
 from watermarking_method import (
     InvalidKeyError,
@@ -107,6 +109,7 @@ def cmd_explore(args: argparse.Namespace) -> int:
 def cmd_embed(args: argparse.Namespace) -> int:
     key = _resolve_key(args)
     secret = _resolve_secret(args)
+#	print("key:",key)
     if not is_watermarking_applicable(method=args.method,pdf=args.input, position=args.position):
         print(f"Method {args.method} is not applicable on {args.output} at {args.position}.")
         return 5
