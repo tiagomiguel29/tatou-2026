@@ -42,7 +42,6 @@ from watermarking_method import (
     load_pdf_bytes,
 )
 from add_after_eof import AddAfterEOF
-from unsafe_bash_bridge_append_eof import UnsafeBashBridgeAppendEOF
 from tiago_invisible_text import TiagoInvisibleText
 from metadata_hmac import MetadataHMAC
 
@@ -52,7 +51,6 @@ from metadata_hmac import MetadataHMAC
 
 METHODS: Dict[str, WatermarkingMethod] = {
     AddAfterEOF.name: AddAfterEOF(),
-    UnsafeBashBridgeAppendEOF.name: UnsafeBashBridgeAppendEOF(),
     TiagoInvisibleText.name: TiagoInvisibleText(),
     MetadataHMAC.name: MetadataHMAC(),
 }
