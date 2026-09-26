@@ -3,8 +3,10 @@ import io
 import hashlib
 import json
 import base64
+import re
 import secrets
 import subprocess
+import time
 import datetime as dt
 from pathlib import Path
 from functools import wraps
@@ -18,6 +20,10 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.exc import IntegrityError
 
 import watermarking_utils as WMUtils
+
+RMAP_METHOD = "tiago-invisible-text"
+RMAP_SESSION_TTL = 300
+RMAP_MAX_SESSIONS = 1000
 
 def create_app():
     app = Flask(__name__)
@@ -82,238 +88,119 @@ def create_app():
                 h.update(chunk)
         return h.hexdigest()
 
-    # --- RMAP helpers ---
-    app.config["RMAP_GPG_HOME"] = os.environ.get(
-        "RMAP_GPG_HOME", "/app/rmap-gnupg"
-    )
+    # --- RMAP ---
+    app.config["RMAP_GPG_HOME"] = os.environ.get("RMAP_GPG_HOME", "/app/rmap-gnupg")
+    app.config["RMAP_KEYS_DIR"] = Path(os.environ.get("RMAP_KEYS_DIR", "/app/rmap-keys"))
+    app.config["RMAP_DOCUMENT_ID"] = os.environ.get("RMAP_DOCUMENT_ID")
+    app.config["RMAP_WATERMARK_KEY"] = os.environ.get("RMAP_WATERMARK_KEY")
+    # Pending handshakes live in memory, so gunicorn must run a single worker.
+    sessions = {}
 
-    # RMAP handshake state: nonceServer -> authenticated identity/nonceClient.
-    # Gunicorn currently runs with its default single worker.
-    app.config["RMAP_SESSIONS"] = {}
-
-    def _rmap_decode_payload(payload):
-        if not isinstance(payload, str) or not payload:
-            raise ValueError("payload must be a non-empty string")
-        try:
-            armored = base64.b64decode(payload, validate=True)
-        except Exception as e:
-            raise ValueError(f"invalid base64 payload: {e}") from e
-        if not armored.startswith(b"-----BEGIN PGP MESSAGE-----"):
-            raise ValueError("payload is not an ASCII-armored GPG message")
-        return armored
-
-    def _rmap_recipient_for_identity(identity):
-        if not isinstance(identity, str) or not identity:
-            raise ValueError("identity must be a non-empty string")
-
-        try:
-            proc = subprocess.run(
-                [
-                    "gpg",
-                    "--batch",
-                    "--with-colons",
-                    "--homedir", app.config["RMAP_GPG_HOME"],
-                    "--list-keys",
-                    identity,
-                ],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                check=False,
-            )
-        except Exception as e:
-            raise RuntimeError(f"GPG identity lookup failed: {e}") from e
-
+    def _gpg(args: list[str], data: bytes) -> bytes:
+        proc = subprocess.run(
+            ["gpg", "--batch", "--quiet", "--homedir", app.config["RMAP_GPG_HOME"], *args],
+            input=data,
+            capture_output=True,
+        )
         if proc.returncode != 0:
-            raise ValueError("unknown identity")
+            app.logger.warning("gpg failed: %s", proc.stderr.decode(errors="replace"))
+            raise RuntimeError("gpg failed")
+        return proc.stdout
 
-        fingerprints = []
-        for line in proc.stdout.splitlines():
-            fields = line.split(":")
-            if len(fields) > 9 and fields[0] == "fpr":
-                fingerprints.append(fields[9])
-
-        if not fingerprints:
-            raise ValueError("identity has no valid public key")
-
-        return fingerprints[0]
-
-
-    def _rmap_decrypt(payload):
-        armored = _rmap_decode_payload(payload)
-
+    def _rmap_decrypt(body) -> dict:
+        passphrase_file = os.path.join(app.config["RMAP_GPG_HOME"], "passphrase")
+        args = ["--pinentry-mode", "loopback", "--passphrase-file", passphrase_file, "--decrypt"]
         try:
-            proc = subprocess.run(
-                [
-                    "gpg",
-                    "--batch",
-                    "--pinentry-mode", "loopback",
-                    "--homedir", app.config["RMAP_GPG_HOME"],
-                    "--passphrase-file",
-                    os.path.join(app.config["RMAP_GPG_HOME"], "passphrase"),
-                    "--decrypt",
-                ],
-                input=armored,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                check=False,
+            data = json.loads(_gpg(args, base64.b64decode(body["payload"], validate=True)))
+        except (TypeError, KeyError, ValueError, RuntimeError):
+            raise ValueError("invalid payload")
+        if not isinstance(data, dict):
+            raise ValueError("invalid payload")
+        return data
+
+    def _rmap_encrypt(data: dict, key_file: Path) -> str:
+        ciphertext = _gpg(["--recipient-file", str(key_file), "--encrypt"], json.dumps(data).encode())
+        return base64.b64encode(ciphertext).decode()
+
+    def _rmap_key_file(identity) -> Path:
+        if isinstance(identity, str) and re.fullmatch(r"[A-Za-z0-9_-]{1,64}", identity):
+            key_file = app.config["RMAP_KEYS_DIR"] / f"{identity}.asc"
+            if key_file.is_file():
+                return key_file
+        raise ValueError("unknown identity")
+
+    def _is_u64(value) -> bool:
+        return type(value) is int and 0 <= value < 2**64
+
+    def _rmap_prune_sessions() -> None:
+        now = time.monotonic()
+        for nonce in [n for n, s in sessions.items() if now - s["created"] > RMAP_SESSION_TTL]:
+            del sessions[nonce]
+
+    def _rmap_create_version(identity: str, link: str) -> None:
+        doc_id = app.config["RMAP_DOCUMENT_ID"]
+        wm_key = app.config["RMAP_WATERMARK_KEY"]
+        if not doc_id or not wm_key:
+            raise RuntimeError("RMAP_DOCUMENT_ID and RMAP_WATERMARK_KEY must be set")
+
+        secret = f"{identity}:{link}"
+        with get_engine().begin() as conn:
+            row = conn.execute(text("SELECT id, path FROM Documents WHERE id = :id"), {"id": int(doc_id)}).one()
+            source = _safe_resolve_under_storage(row.path, app.config["STORAGE_DIR"])
+            dest = source.parent / "watermarks" / f"rmap__{identity}__{link}.pdf"
+            conn.execute(
+                text("""
+                    INSERT INTO Versions (documentid, link, intended_for, secret, method, position, path)
+                    VALUES (:documentid, :link, :intended_for, :secret, :method, '', :path)
+                """),
+                {"documentid": row.id, "link": link, "intended_for": identity,
+                 "secret": secret, "method": RMAP_METHOD, "path": str(dest)},
             )
-        except Exception as e:
-            raise RuntimeError(f"GPG execution failed: {e}") from e
-
-        if proc.returncode != 0:
-            raise ValueError("GPG decryption failed")
-
-        try:
-            obj = json.loads(proc.stdout.decode("utf-8"))
-        except Exception as e:
-            raise ValueError("decrypted payload is not valid JSON") from e
-
-        if not isinstance(obj, dict):
-            raise ValueError("decrypted payload must be a JSON object")
-
-        return obj
-
-    def _rmap_encrypt(obj, recipient):
-        plaintext = json.dumps(
-            obj,
-            separators=(",", ":"),
-            ensure_ascii=False,
-        ).encode("utf-8")
-
-        try:
-            proc = subprocess.run(
-                [
-                    "gpg",
-                    "--batch",
-                    "--yes",
-                    "--armor",
-                    "--homedir", app.config["RMAP_GPG_HOME"],
-                    "--trust-model", "always",
-                    "--encrypt",
-                    "--recipient", recipient,
-                ],
-                input=plaintext,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                check=False,
-            )
-        except Exception as e:
-            raise RuntimeError(f"GPG execution failed: {e}") from e
-
-        if proc.returncode != 0:
-            raise RuntimeError("GPG encryption failed")
-
-        return base64.b64encode(proc.stdout).decode("ascii")
-
-    @app.post("/api/rmap-get-link")
-    def rmap_get_link():
-        payload = (request.get_json(silent=True) or {}).get("payload")
-
-        try:
-            data = _rmap_decrypt(payload)
-            nonce_server = data.get("nonceServer")
-
-            if (
-                not isinstance(nonce_server, int)
-                or not 0 <= nonce_server <= 0xFFFFFFFFFFFFFFFF
-            ):
-                return jsonify({"error": "invalid nonceServer"}), 400
-
-            session = app.config["RMAP_SESSIONS"].pop(nonce_server, None)
-            if session is None:
-                return jsonify({"error": "unknown nonceServer"}), 400
-
-            nonce_client = session["nonceClient"]
-            recipient = session["recipient"]
-
-            result = f"{nonce_client:016x}{nonce_server:016x}"
-
-            # Bind this authenticated RMAP handshake to the group's
-            # watermarked PDF through the existing Versions table.
-            rmap_pdf = Path(
-                "/app/storage/files/phase0test/watermarks/"
-                "Group_22__Group-22-Test.pdf"
-            )
-
-            if not rmap_pdf.exists():
-                return jsonify({"error": "RMAP document unavailable"}), 503
-
-            try:
-                with get_engine().begin() as conn:
-                    conn.execute(
-                        text("""
-                            INSERT INTO Versions
-                                (documentid, link, intended_for, secret, method, position, path)
-                            VALUES
-                                (:documentid, :link, :intended_for, :secret, :method, :position, :path)
-                        """),
-                        {
-                            "documentid": 2,
-                            "link": result,
-                            "intended_for": session["identity"],
-                            "secret": "rmap-existing-watermark",
-                            "method": "metadata-hmac",
-                            "position": "",
-                            "path": str(rmap_pdf),
-                        },
-                    )
-            except Exception as e:
-                return jsonify({"error": f"RMAP version creation failed: {e}"}), 503
-
-            response_payload = _rmap_encrypt(
-                {"result": result},
-                recipient,
-            )
-
-            return jsonify({"payload": response_payload}), 200
-
-        except ValueError as e:
-            return jsonify({"error": str(e)}), 400
-        except RuntimeError as e:
-            return jsonify({"error": str(e)}), 500
-
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_bytes(WMUtils.apply_watermark(RMAP_METHOD, str(source), secret, wm_key))
 
     @app.post("/api/rmap-initiate")
     def rmap_initiate():
-        payload = (request.get_json(silent=True) or {}).get("payload")
-
         try:
-            data = _rmap_decrypt(payload)
-
+            data = _rmap_decrypt(request.get_json(silent=True))
             nonce_client = data.get("nonceClient")
-            identity = data.get("identity")
+            if not _is_u64(nonce_client):
+                raise ValueError("invalid nonceClient")
+            key_file = _rmap_key_file(data.get("identity"))
 
-            if (
-                not isinstance(nonce_client, int)
-                or not 0 <= nonce_client <= 0xFFFFFFFFFFFFFFFF
-            ):
-                return jsonify({"error": "invalid nonceClient"}), 400
-
-            recipient = _rmap_recipient_for_identity(identity)
+            _rmap_prune_sessions()
+            if len(sessions) >= RMAP_MAX_SESSIONS:
+                return jsonify({"error": "too many pending handshakes, retry later"}), 503
 
             nonce_server = secrets.randbits(64)
-
-            app.config["RMAP_SESSIONS"][nonce_server] = {
-                "nonceClient": nonce_client,
-                "identity": identity,
-                "recipient": recipient,
-            }
-
-            response_payload = _rmap_encrypt(
-                {
-                    "nonceClient": nonce_client,
-                    "nonceServer": nonce_server,
-                },
-                recipient,
-            )
-
-            return jsonify({"payload": response_payload}), 200
-
+            sessions[nonce_server] = {"identity": data["identity"], "nonceClient": nonce_client,
+                                      "key_file": key_file, "created": time.monotonic()}
+            payload = _rmap_encrypt({"nonceClient": nonce_client, "nonceServer": nonce_server}, key_file)
         except ValueError as e:
             return jsonify({"error": str(e)}), 400
-        except RuntimeError as e:
-            return jsonify({"error": str(e)}), 500
+        except Exception:
+            app.logger.exception("rmap-initiate failed")
+            return jsonify({"error": "internal error"}), 500
+        return jsonify({"payload": payload}), 200
+
+    @app.post("/api/rmap-get-link")
+    def rmap_get_link():
+        try:
+            nonce_server = _rmap_decrypt(request.get_json(silent=True)).get("nonceServer")
+            _rmap_prune_sessions()
+            session = sessions.pop(nonce_server, None) if _is_u64(nonce_server) else None
+            if session is None:
+                raise ValueError("unknown or expired nonceServer")
+
+            link = f"{session['nonceClient']:016x}{nonce_server:016x}"
+            _rmap_create_version(session["identity"], link)
+            payload = _rmap_encrypt({"result": link}, session["key_file"])
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except Exception:
+            app.logger.exception("rmap-get-link failed")
+            return jsonify({"error": "internal error"}), 500
+        return jsonify({"payload": payload}), 200
 
 
     # --- Routes ---
