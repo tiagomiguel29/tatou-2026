@@ -14,11 +14,12 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0.0",
+    "pytest-cov>=6.0.0",
     "rmap @ git+https://github.com/nharrand/RMAP.git@v1.0.2"
 ]
 
 [tool.pytest.ini_options]
-addopts = "-q"
+addopts = "--cov=server --cov-report=term-missing"
 testpaths = ["test/"]
 python_files = ["test_*.py"]
 

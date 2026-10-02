@@ -145,6 +145,17 @@ def test_each_retrieval_gets_a_distinct_watermarked_copy(app, keys):
     assert len({Path(v.path).read_bytes() for v in versions.values()}) == 3
     assert versions[other].intended_for == "Group_08"
 
+def test_modified_version_link_is_rejected(app, keys):
+    http = app.test_client()
+    link = _handshake(http, _client(keys, "Group_07"))
+
+    modified = ("b" if link[0] != "b" else "c") + link[1:]
+
+    response = http.get(f"/api/get-version/{modified}")
+
+    assert modified != link
+    assert response.status_code == 404
+    assert response.get_json() == {"error": "document not found"}
 
 def test_replayed_msg2_is_rejected(app, keys):
     http = app.test_client()
