@@ -29,7 +29,7 @@ The focused retrieval test run currently reports:
 
 - `test_get_version.py`: 100% statement coverage
 - `server.py`: 22% statement coverage
-- Overall measured coverage: 28%
+- Overall measured coverage: 48% in the latest full-suite run.
 
 Coverage is used as a measurement of tested code paths, not as proof that the security objective is fully verified.
 
@@ -40,3 +40,23 @@ The RMAP test module uses `pytest.importorskip("rmap")`. In the current Python 3
 Therefore the end-to-end RMAP tests are skipped rather than passing.
 
 The standalone retrieval tests remain executable and directly verify that unknown and modified links are rejected by the public retrieval endpoint.
+
+## Security requirement traceability
+
+| Element | Evidence |
+|---|---|
+| Threat | `T.LINK_GUESS` |
+| Objective | `O.LINK_CONFIDENTIALITY` |
+| Requirement | `Platform_specifications.md`: secret link should not be guessable |
+| Implementation | `server/src/server.py`: exact `WHERE link = :link` retrieval |
+| Positive test | `test_handshake_with_official_client_returns_watermarked_pdf` |
+| Negative tests | `test_nonexistent_version_link_is_rejected`; `test_modified_version_link_is_rejected` |
+| Protocol tests | `test_replayed_msg2_is_rejected`; `test_unknown_identity_is_rejected` |
+
+Traceability:
+
+`T.LINK_GUESS -> O.LINK_CONFIDENTIALITY -> Platform_specifications.md -> server/src/server.py -> server/test/`
+
+The latest full-suite run reports 26 passed, 7 skipped, and 48% measured
+coverage. RMAP tests are skipped in the current Python 3.13 environment
+because the dependency cannot import the removed `imghdr` module.
