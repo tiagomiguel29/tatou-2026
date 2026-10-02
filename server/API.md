@@ -347,6 +347,8 @@ This endpoint reads information contain in a pdf document's watermark with the p
 
 **Specification**
  * The endpoint MUST return the secret read in the document.
+ * Only the document owner must be able to read its watermark.
+ * A missing document and a document owned by another user must both return `404 document not found`.
 
 
    ## create-watermark
@@ -400,7 +402,8 @@ This endpoint reads information contain in a pdf document's watermark with the p
 ```
 
 **Specification**
- * Only the owner of a document should be able to create watermarked versions of their documents
+ * Only the owner of a document MUST be able to create watermarked versions of their documents.
+ * A missing document and a document owned by another user MUST both return `404 document not found`.
  * The document owner MUST be able to list all versions of their documents and their intended recipients
  * The payload is a gpg encrypted JSON presented as ASCII armored base64, without any GPG headers.
 
