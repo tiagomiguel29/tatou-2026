@@ -11,6 +11,7 @@ import datetime as dt
 from pathlib import Path
 from functools import wraps
 
+import pymupdf
 from flask import Flask, jsonify, request, g, send_file
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -24,6 +25,23 @@ import watermarking_utils as WMUtils
 RMAP_METHOD = "tiago-invisible-text"
 RMAP_SESSION_TTL = 300
 RMAP_MAX_SESSIONS = 1000
+
+
+def _is_valid_pdf(path: Path) -> bool:
+    try:
+        with path.open("rb") as stream:
+            if stream.read(5) != b"%PDF-":
+                return False
+            stream.seek(0, os.SEEK_END)
+            size = stream.tell()
+            stream.seek(max(0, size - 1024))
+            if re.search(rb"%%EOF[ \t\r\n]*\Z", stream.read()) is None:
+                return False
+
+        with pymupdf.open(str(path)) as document:
+            return bool(document.is_pdf)
+    except (OSError, RuntimeError, ValueError):
+        return False
 
 def create_app():
     app = Flask(__name__)
@@ -301,14 +319,23 @@ def create_app():
             stored_path = _safe_resolve_under_storage(str(user_dir / stored_name), app.config["STORAGE_DIR"])
         except RuntimeError:
             return jsonify({"error": "invalid filename"}), 400
-        file.save(stored_path)
+        try:
+            file.save(stored_path)
+        except OSError:
+            stored_path.unlink(missing_ok=True)
+            app.logger.exception("failed to save uploaded document")
+            return jsonify({"error": "failed to save uploaded document"}), 500
+
+        if not _is_valid_pdf(stored_path):
+            stored_path.unlink(missing_ok=True)
+            return jsonify({"error": "only valid PDF files are accepted"}), 400
 
         sha_hex = _sha256_file(stored_path)
         size = stored_path.stat().st_size
 
         try:
             with get_engine().begin() as conn:
-                conn.execute(
+                result = conn.execute(
                     text("""
                         INSERT INTO Documents (name, path, ownerid, sha256, size)
                         VALUES (:name, :path, :ownerid, UNHEX(:sha256hex), :size)
@@ -321,7 +348,7 @@ def create_app():
                         "size": int(size),
                     },
                 )
-                did = int(conn.execute(text("SELECT LAST_INSERT_ID()")).scalar())
+                did = int(result.lastrowid)
                 row = conn.execute(
                     text("""
                         SELECT id, name, creation, HEX(sha256) AS sha256_hex, size
@@ -331,6 +358,7 @@ def create_app():
                     {"id": did},
                 ).one()
         except Exception as e:
+            stored_path.unlink(missing_ok=True)
             return jsonify({"error": f"database error: {str(e)}"}), 503
 
         return jsonify({
