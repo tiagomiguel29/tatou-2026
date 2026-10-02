@@ -33,6 +33,17 @@ The focused retrieval test run currently reports:
 
 Coverage is used as a measurement of tested code paths, not as proof that the security objective is fully verified.
 
+## Automated CI verification
+
+The `.github/workflows/security-tests.yml` workflow runs `pytest server/test/ -v`
+automatically on pushes to the security-testing branch and pull requests.
+
+The workflow completed successfully for commit `9f65937` (`docs: add security
+requirements traceability`). The GitHub Actions job confirms successful
+workflow execution, but the individual pytest log is not available in the
+current GitHub session, so this evidence does not claim a specific CI test
+count or that the RMAP tests were executed rather than skipped.
+
 ## Current limitation
 
 The RMAP test module uses `pytest.importorskip("rmap")`. In the current Python 3.13 environment, the RMAP dependency cannot be imported because the installed dependency currently cannot import under Python 3.13 due to the removed standard-library `imghdr` module.
