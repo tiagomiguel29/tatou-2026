@@ -45,5 +45,6 @@ line coverage was 95.5%, versus 50% across the project. This focused experiment
 does not establish the security of other routes or PDF contents.
 
 The main README explains how to rerun the experiment and what each test checks.
-The other files include the results, copies of the code and tests, and records
-showing that the results were repeated.
+The `code-copies/` folder contains the code and tests, `mutants/` the mutation
+examples, and `patches/` the fix. The `results/` and `logs/` folders contain the
+results and records showing that they were repeated.

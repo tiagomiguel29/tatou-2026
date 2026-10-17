@@ -47,8 +47,8 @@ def main():
         environment.update(SECRET_KEY="mutation-reproduction-test-only",
                            STORAGE_DIR=str(workspace / "storage"))
         for stage in stages:
-            source = HERE / ("baseline-server.py" if stage != "final" else "final-server.py")
-            tests = HERE / f"{stage}_test_upload_validation.py"
+            source = HERE / "code-copies" / ("baseline-server.py" if stage != "final" else "final-server.py")
+            tests = HERE / "code-copies" / f"{stage}_test_upload_validation.py"
             if (workspace / "src/server.py").read_bytes() != source.read_bytes():
                 shutil.rmtree(workspace / "mutants", ignore_errors=True)
             shutil.copy2(source, workspace / "src/server.py")
