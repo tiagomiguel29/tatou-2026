@@ -406,6 +406,9 @@ This endpoint reads information contain in a pdf document's watermark with the p
 **Specification**
  * Only the owner of a document MUST be able to create watermarked versions of their documents.
  * A missing document and a document owned by another user MUST both return `404 document not found`.
+ * Version links MUST be cryptographically random and independent of document or recipient names.
+ * Repeated requests MUST create distinct links and stored copies.
+ * Anyone holding a valid link can download its PDF without authentication.
  * The document owner MUST be able to list all versions of their documents and their intended recipients
  * The payload is a gpg encrypted JSON presented as ASCII armored base64, without any GPG headers.
 

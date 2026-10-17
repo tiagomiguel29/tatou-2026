@@ -1,5 +1,13 @@
 # SOFTSEC Group 22 — Event Journal
 
+## 2026-10-12 — Predictable version-link fix
+
+- Replaced filename-derived links with random tokens and separate stored copies.
+- Added seven regression tests covering link prediction, downloads, independent
+  copies, collisions, failure cleanup and transactional legacy-link rotation.
+- On 17 October, deployed the fix and rotated 20 legacy links with user approval. Verification
+  found none remaining. Old URLs were invalidated; RMAP links were preserved.
+
 ## 2026-09-20 — Flag 2 capture incident
 
 ### Discovery
