@@ -1,5 +1,11 @@
 # SOFTSEC Group 22 — Event Journal
 
+## 2026-10-17 — RMAP document collection
+
+- Retrieved 12 watermarked PDFs as Group 22 from groups 02, 04, 06, 08, 10, 12,
+  14, 16, 18, 20, 30 and 34 through authenticated RMAP exchanges.
+- Saved the unchanged PDFs under `artifacts/common/collected-pdfs/`.
+
 ## 2026-10-12 — Predictable version-link fix
 
 - Replaced filename-derived links with random tokens and separate stored copies.
