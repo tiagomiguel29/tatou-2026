@@ -33,9 +33,19 @@ def _is_valid_pdf(path: Path) -> bool:
             if stream.read(5) != b"%PDF-":
                 return False
             stream.seek(0, os.SEEK_END)
-            size = stream.tell()
-            stream.seek(max(0, size - 1024))
-            if re.search(rb"%%EOF[ \t\r\n]*\Z", stream.read()) is None:
+            end = stream.tell()
+            while end > 0:
+                start = max(0, end - 1024)
+                stream.seek(start)
+                tail = stream.read(end - start).rstrip(b" \t\r\n")
+                if tail:
+                    marker_end = start + len(tail)
+                    stream.seek(max(0, marker_end - 5))
+                    if stream.read(5) != b"%%EOF":
+                        return False
+                    break
+                end = start
+            else:
                 return False
 
         with pymupdf.open(str(path)) as document:
@@ -87,16 +97,50 @@ def create_app():
         def wrapper(*args, **kwargs):
             auth = request.headers.get("Authorization", "")
             if not auth.startswith("Bearer "):
-                return _auth_error("Missing or invalid Authorization header")
+                app.logger.warning(
+                    "security_event=authentication_failed "
+                    "reason=missing_or_invalid_authorization_header "
+                    "endpoint=%s method=%s remote_addr=%s",
+                    request.path,
+                    request.method,
+                    request.remote_addr,
+                )
+                return _auth_error(
+                    "Missing or invalid Authorization header"
+                )
+
             token = auth.split(" ", 1)[1].strip()
             try:
-                data = _serializer().loads(token, max_age=app.config["TOKEN_TTL_SECONDS"])
+                data = _serializer().loads(
+                    token,
+                    max_age=app.config["TOKEN_TTL_SECONDS"],
+                )
             except SignatureExpired:
+                app.logger.warning(
+                    "security_event=authentication_failed "
+                    "reason=expired_token endpoint=%s method=%s remote_addr=%s",
+                    request.path,
+                    request.method,
+                    request.remote_addr,
+                )
                 return _auth_error("Token expired")
             except BadSignature:
+                app.logger.warning(
+                    "security_event=authentication_failed "
+                    "reason=invalid_token endpoint=%s method=%s remote_addr=%s",
+                    request.path,
+                    request.method,
+                    request.remote_addr,
+                )
                 return _auth_error("Invalid token")
-            g.user = {"id": int(data["uid"]), "login": data["login"], "email": data.get("email")}
+
+            g.user = {
+                "id": int(data["uid"]),
+                "login": data["login"],
+                "email": data.get("email"),
+            }
             return f(*args, **kwargs)
+
         return wrapper
 
     def _sha256_file(path: Path) -> str:
@@ -763,17 +807,15 @@ def create_app():
         dest_dir.mkdir(parents=True, exist_ok=True)
 
         candidate = f"{base_name}__{intended_slug}.pdf"
-        dest_path = dest_dir / candidate
+        link_token = secrets.token_urlsafe(32)
+        dest_path = dest_dir / f"{link_token}.pdf"
 
         # write bytes
         try:
-            with dest_path.open("wb") as f:
+            with dest_path.open("xb") as f:
                 f.write(wm_bytes)
         except Exception as e:
             return jsonify({"error": f"failed to write watermarked file: {e}"}), 500
-
-        # link token = sha1(watermarked_file_name)
-        link_token = hashlib.sha1(candidate.encode("utf-8")).hexdigest()
 
         try:
             with get_engine().begin() as conn:

@@ -145,6 +145,11 @@ This endpoint uploads a PDF document to the server and registers its metadata.
 **Specification**
  * Requires authentication
  * The upload-pdf endpoint MUST accept only files in PDF format.
+ * Upload validation requires a `%PDF-` signature at the start, a final `%%EOF`
+   marker followed only by spaces, tabs, CR or LF, and successful PyMuPDF parsing.
+   There is no 1024-byte limit on the permitted trailing whitespace.
+ * Invalid files return HTTP 400 and leave neither a stored file nor a document row.
+   A database failure after validation returns HTTP 503 and removes the saved file.
 
 ## list-documents
 

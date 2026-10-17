@@ -1,5 +1,42 @@
 # SOFTSEC Group 22 — Event Journal
 
+## 2026-10-17 — Server update and restart
+
+- Built a combined release from local main and the PDF-validator correction,
+  preserving the server's existing authentication logging, startup changes,
+  RMAP development dependency, course keys and operational-security documents.
+- Preserved the server's `niloy-phase2` branch and created no Git commits.
+- Backed up the repository, working files, database, uploaded files and previous
+  image under `/home/softsec/backups/deployment-20261017T150932Z` before updating.
+- Combined-release tests: 56 passed and six applicability skips.
+- Rebuilt and restarted only the application container. Database health passed;
+  eight live API checks covered authentication, account creation/login, upload
+  validation, ownership, watermarking, downloads and independent random links.
+  Temporary test accounts and files were removed afterward.
+- Verified the running source hash, RMAP source document/key availability and
+  presence of the configured flag without recording secret values.
+- API health passed through an SSH tunnel. Direct port 5000 access from this
+  computer over the VPN timed out; the server listener and firewall allow it.
+- With explicit user approval, rotated 20 legacy predictable links at 15:23 UTC.
+  Verification found zero remaining; old URLs are invalidated and RMAP links
+  retain their separate format. The migration ran transactionally.
+- Release fingerprints and the preserved server-only source changes are recorded
+  in `artifacts/common/deployments/2026-10-17/`.
+
+## 2026-10-17 — Focused mutation testing of PDF uploads
+
+- Restored four upload regression cases from the existing handoff; baseline mutmut
+  run killed 30 of 35 selected PDF-validator mutants.
+- Added boundary, parser-repair, metadata and cleanup assertions. On unchanged code,
+  these killed 31 of the same 35 mutants.
+- Found and reproduced a false-rejection defect: valid PDFs with long permitted
+  trailing whitespace returned 400. Three tests failed before the fix.
+- Changed validation to scan backward in bounded chunks and updated the API contract.
+- Final suite has 18 upload cases; 46 of 55 corrected-code mutants killed and nine
+  survivors retained with analysis. Full local suite: 47 passed, six applicability skips.
+- Recorded raw evidence and a reproducible specialization-B report under
+  `artifacts/tiago/mutation-testing/`. No VM deployment or offensive action.
+
 ## 2026-09-20 — Flag 2 capture incident
 
 ### Discovery
