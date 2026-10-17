@@ -1,0 +1,72 @@
+⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠼ Generating mutants⠴ Generating mutants⠦ Generating mutants⠧ Generating mutants⠇ Generating mutants⠏ Generating mutants⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠼ Generating mutants⠴ Generating mutants⠦ Generating mutants⠧ Generating mutants⠇ Generating mutants⠏ Generating mutants⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠼ Generating mutants⠴ Generating mutants⠦ Generating mutants⠧ Generating mutants⠇ Generating mutants⠏ Generating mutants⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠸ Generating mutants⠼ Generating mutants⠼ Generating mutants⠴ Generating mutants⠦ Generating mutants⠧ Generating mutants⠇ Generating mutants⠏ Generating mutants⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠼ Generating mutants
+    done in 24478ms (1 files mutated, 6 ignored, 0 unmodified)
+⠸ Listing all tests ⠼ Listing all tests⠴ Listing all tests⠦ Listing all tests⠧ Listing all tests⠇ Listing all tests⠏ Listing all tests⠋ Listing all tests⠙ Listing all tests⠹ Listing all tests⠸ Listing all tests⠼ Listing all tests⠴ Listing all tests⠦ Listing all tests⠧ Listing all tests⠇ Listing all tests⠏ Listing all tests⠋ Listing all tests⠙ Listing all tests⠹ Listing all tests⠸ Listing all tests⠼ Listing all tests⠴ Listing all tests
+Found 3 new tests, rerunning stats collection
+⠦ Running stats    ⠧ Running stats⠇ Running stats⠏ Running stats⠋ Running stats⠙ Running stats⠹ Running stats⠸ Running stats⠼ Running stats⠴ Running stats⠦ Running stats⠧ Running stats⠇ Running stats⠏ Running stats⠋ Running stats
+    done
+⠙ Running clean tests⠹ Running clean tests⠸ Running clean tests⠼ Running clean tests⠴ Running clean tests⠦ Running clean tests⠧ Running clean tests⠇ Running clean tests⠏ Running clean tests⠋ Running clean tests⠙ Running clean tests⠹ Running clean tests⠸ Running clean tests⠼ Running clean tests⠴ Running clean tests⠦ Running clean tests⠧ Running clean tests⠇ Running clean tests⠏ Running clean tests⠋ Running clean tests⠙ Running clean tests⠹ Running clean tests⠸ Running clean tests⠼ Running clean tests⠴ Running clean tests⠦ Running clean tests
+    done
+⠧ Running forced fail test⠇ Running forced fail test⠏ Running forced fail test⠋ Running forced fail test⠙ Running forced fail test⠹ Running forced fail test⠸ Running forced fail test⠼ Running forced fail test⠴ Running forced fail test⠦ Running forced fail test⠧ Running forced fail test⠇ Running forced fail test⠏ Running forced fail test⠋ Running forced fail test
+    done
+Running mutation testing
+⠙ 0/454  🎉 0 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠹ 0/454  🎉 0 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠸ 0/454  🎉 0 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠼ 1/454  🎉 1 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠴ 2/454  🎉 2 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠦ 3/454  🎉 3 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠧ 4/454  🎉 4 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠇ 5/454  🎉 5 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠏ 6/454  🎉 6 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠋ 7/454  🎉 7 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠙ 8/454  🎉 8 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠹ 9/454  🎉 9 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠸ 10/454  🎉 10 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠼ 11/454  🎉 11 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠴ 12/454  🎉 12 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠦ 13/454  🎉 13 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠧ 14/454  🎉 14 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠇ 15/454  🎉 14 🫥 0  ⏰ 0  🤔 0  🙁 1  🔇 0  🧙 0⠏ 16/454  🎉 14 🫥 0  ⏰ 0  🤔 0  🙁 2  🔇 0  🧙 0⠋ 17/454  🎉 15 🫥 0  ⏰ 0  🤔 0  🙁 2  🔇 0  🧙 0⠙ 18/454  🎉 16 🫥 0  ⏰ 0  🤔 0  🙁 2  🔇 0  🧙 0⠹ 19/454  🎉 16 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠸ 20/454  🎉 17 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠼ 21/454  🎉 18 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠴ 22/454  🎉 19 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠦ 23/454  🎉 20 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠧ 24/454  🎉 20 🫥 0  ⏰ 0  🤔 0  🙁 4  🔇 0  🧙 0⠇ 25/454  🎉 21 🫥 0  ⏰ 0  🤔 0  🙁 4  🔇 0  🧙 0⠏ 26/454  🎉 22 🫥 0  ⏰ 0  🤔 0  🙁 4  🔇 0  🧙 0⠋ 27/454  🎉 22 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠙ 28/454  🎉 23 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠹ 29/454  🎉 23 🫥 0  ⏰ 0  🤔 0  🙁 6  🔇 0  🧙 0⠸ 30/454  🎉 23 🫥 0  ⏰ 0  🤔 0  🙁 7  🔇 0  🧙 0⠼ 31/454  🎉 23 🫥 0  ⏰ 0  🤔 0  🙁 8  🔇 0  🧙 0⠴ 32/454  🎉 24 🫥 0  ⏰ 0  🤔 0  🙁 8  🔇 0  🧙 0⠦ 33/454  🎉 24 🫥 0  ⏰ 0  🤔 0  🙁 9  🔇 0  🧙 0⠧ 34/454  🎉 25 🫥 0  ⏰ 0  🤔 0  🙁 9  🔇 0  🧙 0⠇ 35/454  🎉 26 🫥 0  ⏰ 0  🤔 0  🙁 9  🔇 0  🧙 0⠏ 36/454  🎉 27 🫥 0  ⏰ 0  🤔 0  🙁 9  🔇 0  🧙 0⠋ 37/454  🎉 28 🫥 0  ⏰ 0  🤔 0  🙁 9  🔇 0  🧙 0⠙ 38/454  🎉 29 🫥 0  ⏰ 0  🤔 0  🙁 9  🔇 0  🧙 0⠹ 39/454  🎉 30 🫥 0  ⏰ 0  🤔 0  🙁 9  🔇 0  🧙 0⠸ 40/454  🎉 31 🫥 0  ⏰ 0  🤔 0  🙁 9  🔇 0  🧙 0⠼ 41/454  🎉 31 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠴ 42/454  🎉 32 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠦ 43/454  🎉 33 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠧ 44/454  🎉 34 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠇ 45/454  🎉 35 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠏ 46/454  🎉 36 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠋ 47/454  🎉 37 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠙ 48/454  🎉 38 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠹ 49/454  🎉 39 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠸ 50/454  🎉 40 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠼ 51/454  🎉 41 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠴ 52/454  🎉 42 🫥 0  ⏰ 0  🤔 0  🙁 10  🔇 0  🧙 0⠦ 55/454  🎉 44 🫥 0  ⏰ 0  🤔 0  🙁 11  🔇 0  🧙 0
+26.17 mutations/second
+
+Mutant results
+--------------
+🎉 server.x__is_valid_pdf__mutmut_1
+🎉 server.x__is_valid_pdf__mutmut_10
+🎉 server.x__is_valid_pdf__mutmut_11
+🎉 server.x__is_valid_pdf__mutmut_12
+🎉 server.x__is_valid_pdf__mutmut_13
+🙁 server.x__is_valid_pdf__mutmut_14
+🎉 server.x__is_valid_pdf__mutmut_15
+🙁 server.x__is_valid_pdf__mutmut_16
+🙁 server.x__is_valid_pdf__mutmut_17
+🎉 server.x__is_valid_pdf__mutmut_18
+🎉 server.x__is_valid_pdf__mutmut_19
+🎉 server.x__is_valid_pdf__mutmut_2
+🎉 server.x__is_valid_pdf__mutmut_20
+🎉 server.x__is_valid_pdf__mutmut_21
+🎉 server.x__is_valid_pdf__mutmut_22
+🙁 server.x__is_valid_pdf__mutmut_23
+🎉 server.x__is_valid_pdf__mutmut_24
+🙁 server.x__is_valid_pdf__mutmut_25
+🎉 server.x__is_valid_pdf__mutmut_26
+🎉 server.x__is_valid_pdf__mutmut_27
+🙁 server.x__is_valid_pdf__mutmut_28
+🎉 server.x__is_valid_pdf__mutmut_29
+🎉 server.x__is_valid_pdf__mutmut_3
+🙁 server.x__is_valid_pdf__mutmut_30
+🙁 server.x__is_valid_pdf__mutmut_31
+🙁 server.x__is_valid_pdf__mutmut_32
+🎉 server.x__is_valid_pdf__mutmut_33
+🎉 server.x__is_valid_pdf__mutmut_34
+🎉 server.x__is_valid_pdf__mutmut_35
+🎉 server.x__is_valid_pdf__mutmut_36
+🎉 server.x__is_valid_pdf__mutmut_37
+🎉 server.x__is_valid_pdf__mutmut_38
+🎉 server.x__is_valid_pdf__mutmut_39
+🎉 server.x__is_valid_pdf__mutmut_4
+🙁 server.x__is_valid_pdf__mutmut_40
+🎉 server.x__is_valid_pdf__mutmut_41
+🎉 server.x__is_valid_pdf__mutmut_42
+🎉 server.x__is_valid_pdf__mutmut_43
+🎉 server.x__is_valid_pdf__mutmut_44
+🎉 server.x__is_valid_pdf__mutmut_45
+🎉 server.x__is_valid_pdf__mutmut_46
+🎉 server.x__is_valid_pdf__mutmut_47
+🎉 server.x__is_valid_pdf__mutmut_48
+🎉 server.x__is_valid_pdf__mutmut_49
+🎉 server.x__is_valid_pdf__mutmut_5
+🎉 server.x__is_valid_pdf__mutmut_50
+🙁 server.x__is_valid_pdf__mutmut_51
+🎉 server.x__is_valid_pdf__mutmut_52
+🎉 server.x__is_valid_pdf__mutmut_53
+🎉 server.x__is_valid_pdf__mutmut_54
+🎉 server.x__is_valid_pdf__mutmut_55
+🎉 server.x__is_valid_pdf__mutmut_6
+🎉 server.x__is_valid_pdf__mutmut_7
+🎉 server.x__is_valid_pdf__mutmut_8
+🎉 server.x__is_valid_pdf__mutmut_9
+

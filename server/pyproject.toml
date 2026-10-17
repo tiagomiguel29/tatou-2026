@@ -24,3 +24,11 @@ python_files = ["test_*.py"]
 
 [project.scripts]
 pdfwm = "watermarking_cli:main"                 # now you can run `pdfwm methods`
+
+[tool.mutmut]
+source_paths = ["src/"]
+only_mutate = ["src/server.py"]
+pytest_add_cli_args_test_selection = ["test/test_upload_validation.py"]
+pytest_add_cli_args = ["-q", "-x"]
+use_setproctitle = false
+use_git_change_detection = false

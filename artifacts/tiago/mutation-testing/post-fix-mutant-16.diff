@@ -1,0 +1,12 @@
+# server.x__is_valid_pdf__mutmut_16: survived
+--- src/server.py
++++ src/server.py
+@@ -7,7 +7,7 @@
+             end = stream.tell()
+             # Skip trailing whitespace in bounded chunks, rather than requiring
+             # the EOF marker to fall inside the last 1024 bytes of the file.
+-            while end > 0:
++            while end >= 0:
+                 start = max(0, end - 1024)
+                 stream.seek(start)
+                 tail = stream.read(end - start).rstrip(b" \t\r\n")

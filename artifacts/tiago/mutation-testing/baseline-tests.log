@@ -1,0 +1,31 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-8.4.2, pluggy-1.7.0
+rootdir: /private/var/folders/rr/gp63hhhx43df7v4s6sj61h6m0000gn/T/tatou-mutation-4i5pzul1
+configfile: pyproject.toml
+plugins: cov-6.3.0, platformdirs-4.13.3
+collected 4 items
+
+test/test_upload_validation.py ....                                      [100%]
+
+=============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+test/test_upload_validation.py::test_accepts_structurally_valid_pdf
+test/test_upload_validation.py::test_rejects_non_pdf_and_removes_file[wrong-magic]
+test/test_upload_validation.py::test_rejects_non_pdf_and_removes_file[fake-pdf-header]
+test/test_upload_validation.py::test_rejects_non_pdf_and_removes_file[trailing-payload]
+  /private/var/folders/rr/gp63hhhx43df7v4s6sj61h6m0000gn/T/tatou-mutation-4i5pzul1/src/server.py:315: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    ts = dt.datetime.utcnow().strftime("%Y%m%dT%H%M%S%fZ")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 4 passed, 9 warnings in 0.29s =========================
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

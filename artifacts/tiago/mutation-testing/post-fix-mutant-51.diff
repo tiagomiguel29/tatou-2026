@@ -1,0 +1,12 @@
+# server.x__is_valid_pdf__mutmut_51: survived
+--- src/server.py
++++ src/server.py
+@@ -19,7 +19,7 @@
+                     break
+                 end = start
+             else:
+-                return False
++                return True
+ 
+         with pymupdf.open(str(path)) as document:
+             return bool(document.is_pdf)

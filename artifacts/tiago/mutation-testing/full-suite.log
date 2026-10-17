@@ -1,0 +1,81 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.14, pytest-8.4.2, pluggy-1.7.0
+rootdir: /Users/tiagooliveira/Developer/repos/tatou-2026/server
+configfile: pyproject.toml
+plugins: cov-6.3.0, platformdirs-4.13.3
+collected 53 items
+
+server/test/test_api.py .                                                [  1%]
+server/test/test_metadata_hmac.py ......                                 [ 13%]
+server/test/test_rmap.py .....                                           [ 22%]
+server/test/test_tiago_invisible_text.py ..............                  [ 49%]
+server/test/test_upload_validation.py ..................                 [ 83%]
+server/test/test_watermarking_all_methods.py .ss.ss.ss                   [100%]
+
+=============================== warnings summary ===============================
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+<frozen importlib._bootstrap>:488
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type swigvarlink has no __module__ attribute
+
+test/test_rmap.py: 14 warnings
+  /Users/tiagooliveira/Developer/repos/tatou-2026/.venv/lib/python3.12/site-packages/pgpy/constants.py:193: CryptographyDeprecationWarning: TripleDES has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.TripleDES and will be removed from cryptography.hazmat.primitives.ciphers.algorithms in 48.0.0.
+    SymmetricKeyAlgorithm.TripleDES: algorithms.TripleDES,
+
+test/test_rmap.py: 14 warnings
+  /Users/tiagooliveira/Developer/repos/tatou-2026/.venv/lib/python3.12/site-packages/pgpy/constants.py:200: CryptographyDeprecationWarning: Camellia has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.Camellia and will be removed from cryptography.hazmat.primitives.ciphers.algorithms in 49.0.0.
+    SymmetricKeyAlgorithm.Camellia128: algorithms.Camellia,
+
+test/test_rmap.py: 14 warnings
+  /Users/tiagooliveira/Developer/repos/tatou-2026/.venv/lib/python3.12/site-packages/pgpy/constants.py:201: CryptographyDeprecationWarning: Camellia has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.Camellia and will be removed from cryptography.hazmat.primitives.ciphers.algorithms in 49.0.0.
+    SymmetricKeyAlgorithm.Camellia192: algorithms.Camellia,
+
+test/test_rmap.py: 14 warnings
+  /Users/tiagooliveira/Developer/repos/tatou-2026/.venv/lib/python3.12/site-packages/pgpy/constants.py:202: CryptographyDeprecationWarning: Camellia has been moved to cryptography.hazmat.decrepit.ciphers.algorithms.Camellia and will be removed from cryptography.hazmat.primitives.ciphers.algorithms in 49.0.0.
+    SymmetricKeyAlgorithm.Camellia256: algorithms.Camellia}
+
+test/test_rmap.py: 12 warnings
+  /Users/tiagooliveira/Developer/repos/tatou-2026/.venv/lib/python3.12/site-packages/pgpy/symenc.py:29: CryptographyDeprecationWarning: CFB has been moved to cryptography.hazmat.decrepit.ciphers.modes.CFB and will be removed from cryptography.hazmat.primitives.ciphers.modes in 49.0.0.
+    encryptor = Cipher(alg.cipher(key), modes.CFB(iv), default_backend()).encryptor()
+
+test/test_rmap.py::test_handshake_with_official_client_returns_watermarked_pdf
+test/test_rmap.py::test_handshake_with_official_client_returns_watermarked_pdf
+test/test_rmap.py::test_each_retrieval_gets_a_distinct_watermarked_copy
+test/test_rmap.py::test_each_retrieval_gets_a_distinct_watermarked_copy
+test/test_rmap.py::test_each_retrieval_gets_a_distinct_watermarked_copy
+test/test_rmap.py::test_each_retrieval_gets_a_distinct_watermarked_copy
+test/test_rmap.py::test_each_retrieval_gets_a_distinct_watermarked_copy
+test/test_rmap.py::test_each_retrieval_gets_a_distinct_watermarked_copy
+test/test_rmap.py::test_replayed_msg2_is_rejected
+  /Users/tiagooliveira/Developer/repos/tatou-2026/.venv/lib/python3.12/site-packages/pgpy/symenc.py:50: CryptographyDeprecationWarning: CFB has been moved to cryptography.hazmat.decrepit.ciphers.modes.CFB and will be removed from cryptography.hazmat.primitives.ciphers.modes in 49.0.0.
+    decryptor = Cipher(alg.cipher(key), modes.CFB(iv), default_backend()).decryptor()
+
+test/test_upload_validation.py: 17 warnings
+  /Users/tiagooliveira/Developer/repos/tatou-2026/server/src/server.py:327: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    ts = dt.datetime.utcnow().strftime("%Y%m%dT%H%M%S%fZ")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: /Users/tiagooliveira/Developer/repos/tatou-2026/artifacts/tiago/mutation-testing/full-suite.xml -
+================================ tests coverage ================================
+______________ coverage: platform darwin, python 3.12.14-final-0 _______________
+
+Name                                 Stmts   Miss  Cover   Missing
+------------------------------------------------------------------
+server/src/add_after_eof.py             70     14    80%   69, 85, 87, 98, 119, 123, 131, 136-137, 140, 142, 148-149, 153
+server/src/metadata_hmac.py             70     13    81%   31, 44, 78-81, 96-97, 101, 124-125, 142-143
+server/src/server.py                   538    284    47%   51, 64, 95, 102, 106-109, 136-137, 145-146, 148, 168, 174, 198, 203, 211-213, 230-232, 240, 244, 250-251, 259-284, 289-308, 315, 318, 322, 332-333, 336-339, 388-409, 419-449, 456-478, 487-539, 556-557, 561, 568-570, 573, 594, 599-604, 613-672, 687-816, 831-836, 844-908, 922-923
+server/src/tiago_invisible_text.py      76      6    92%   29, 36-37, 58, 95-96
+server/src/watermarking_cli.py         126    126     0%   28-243
+server/src/watermarking_method.py       41      8    80%   104-108, 113, 158, 199, 233, 260
+server/src/watermarking_utils.py        80     50    38%   67, 79, 82-83, 109-110, 115-116, 132, 160-242
+------------------------------------------------------------------
+TOTAL                                 1001    501    50%
+Coverage JSON written to file artifacts/tiago/mutation-testing/coverage.json
+================== 47 passed, 6 skipped, 99 warnings in 5.73s ==================
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

@@ -1,0 +1,23 @@
+{
+  "baseline": {
+    "tested": 35,
+    "killed": 30,
+    "survived": 5,
+    "source_sha256": "5c183f7fe042dd6b4d6c2f417b43b79d2e992b5b27338284dc9eba2130475cac",
+    "tests_sha256": "9af926aa6d1a3ac7ce63e6380fbc06a4c23e0a81f83cab34c94abc1353dd4237"
+  },
+  "strengthened": {
+    "tested": 35,
+    "killed": 31,
+    "survived": 4,
+    "source_sha256": "5c183f7fe042dd6b4d6c2f417b43b79d2e992b5b27338284dc9eba2130475cac",
+    "tests_sha256": "b58f297e5fb5b1c84f98b14ca93d68662a481ca90f08b652529dc112dc7dcac7"
+  },
+  "final": {
+    "tested": 55,
+    "killed": 46,
+    "survived": 9,
+    "source_sha256": "02e4e896b5569f852f0f1425080908f70cda027de613285592a2fa4860697d1a",
+    "tests_sha256": "e15334ba832ccaf00224ae7ddc21d85e643a5d677379e1673f66bc1f8f0e4413"
+  }
+}

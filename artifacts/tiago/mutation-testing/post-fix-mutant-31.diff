@@ -1,0 +1,12 @@
+# server.x__is_valid_pdf__mutmut_31: survived
+--- src/server.py
++++ src/server.py
+@@ -10,7 +10,7 @@
+             while end > 0:
+                 start = max(0, end - 1024)
+                 stream.seek(start)
+-                tail = stream.read(end - start).rstrip(b" \t\r\n")
++                tail = stream.read(end + start).rstrip(b" \t\r\n")
+                 if tail:
+                     marker_end = start + len(tail)
+                     stream.seek(max(0, marker_end - 5))

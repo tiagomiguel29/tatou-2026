@@ -1,0 +1,12 @@
+# server.x__is_valid_pdf__mutmut_40: survived
+--- src/server.py
++++ src/server.py
+@@ -13,7 +13,7 @@
+                 tail = stream.read(end - start).rstrip(b" \t\r\n")
+                 if tail:
+                     marker_end = start + len(tail)
+-                    stream.seek(max(0, marker_end - 5))
++                    stream.seek(max(1, marker_end - 5))
+                     if stream.read(5) != b"%%EOF":
+                         return False
+                     break

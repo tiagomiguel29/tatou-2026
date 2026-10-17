@@ -1,0 +1,12 @@
+# server.x__is_valid_pdf__mutmut_12: survived
+--- src/server.py
++++ src/server.py
+@@ -3,7 +3,7 @@
+         with path.open("rb") as stream:
+             if stream.read(5) != b"%PDF-":
+                 return False
+-            stream.seek(0, os.SEEK_END)
++            stream.seek(os.SEEK_END)
+             size = stream.tell()
+             stream.seek(max(0, size - 1024))
+             if re.search(rb"%%EOF[ \t\r\n]*\Z", stream.read()) is None:

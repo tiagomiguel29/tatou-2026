@@ -1,0 +1,12 @@
+# server.x__is_valid_pdf__mutmut_14: survived
+--- src/server.py
++++ src/server.py
+@@ -3,7 +3,7 @@
+         with path.open("rb") as stream:
+             if stream.read(5) != b"%PDF-":
+                 return False
+-            stream.seek(0, os.SEEK_END)
++            stream.seek(1, os.SEEK_END)
+             end = stream.tell()
+             # Skip trailing whitespace in bounded chunks, rather than requiring
+             # the EOF marker to fall inside the last 1024 bytes of the file.

@@ -1,0 +1,50 @@
+⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠼ Generating mutants⠴ Generating mutants⠦ Generating mutants⠧ Generating mutants⠇ Generating mutants⠏ Generating mutants⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠼ Generating mutants⠴ Generating mutants⠦ Generating mutants⠧ Generating mutants⠇ Generating mutants⠏ Generating mutants⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠼ Generating mutants⠴ Generating mutants⠦ Generating mutants⠧ Generating mutants⠇ Generating mutants⠏ Generating mutants⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠸ Generating mutants⠼ Generating mutants⠼ Generating mutants⠴ Generating mutants⠦ Generating mutants⠧ Generating mutants⠇ Generating mutants⠏ Generating mutants⠋ Generating mutants⠙ Generating mutants⠹ Generating mutants⠸ Generating mutants⠼ Generating mutants
+    done in 23611ms (1 files mutated, 6 ignored, 0 unmodified)
+⠸ Running stats     ⠼ Running stats⠴ Running stats⠦ Running stats⠧ Running stats⠇ Running stats⠏ Running stats⠋ Running stats⠙ Running stats⠹ Running stats⠸ Running stats⠼ Running stats⠴ Running stats⠦ Running stats⠧ Running stats⠇ Running stats⠏ Running stats⠋ Running stats⠙ Running stats⠹ Running stats⠸ Running stats⠼ Running stats⠴ Running stats⠦ Running stats⠧ Running stats⠇ Running stats⠏ Running stats⠋ Running stats⠙ Running stats⠹ Running stats⠸ Running stats
+    done
+⠼ Running clean tests⠴ Running clean tests⠦ Running clean tests⠧ Running clean tests⠇ Running clean tests⠏ Running clean tests⠋ Running clean tests⠙ Running clean tests⠹ Running clean tests⠸ Running clean tests⠼ Running clean tests⠴ Running clean tests⠦ Running clean tests⠧ Running clean tests⠇ Running clean tests⠏ Running clean tests
+    done
+⠋ Running forced fail test⠙ Running forced fail test⠹ Running forced fail test⠸ Running forced fail test⠼ Running forced fail test⠴ Running forced fail test⠦ Running forced fail test⠧ Running forced fail test⠇ Running forced fail test⠏ Running forced fail test⠋ Running forced fail test⠙ Running forced fail test⠹ Running forced fail test⠸ Running forced fail test
+    done
+Running mutation testing
+⠼ 0/434  🎉 0 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠴ 0/434  🎉 0 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠦ 0/434  🎉 0 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠧ 1/434  🎉 1 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠇ 2/434  🎉 2 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠏ 3/434  🎉 3 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠋ 4/434  🎉 4 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠙ 5/434  🎉 5 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠹ 6/434  🎉 6 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠸ 7/434  🎉 7 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠼ 8/434  🎉 8 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠴ 9/434  🎉 9 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠦ 10/434  🎉 10 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠧ 11/434  🎉 11 🫥 0  ⏰ 0  🤔 0  🙁 0  🔇 0  🧙 0⠇ 12/434  🎉 11 🫥 0  ⏰ 0  🤔 0  🙁 1  🔇 0  🧙 0⠏ 13/434  🎉 11 🫥 0  ⏰ 0  🤔 0  🙁 2  🔇 0  🧙 0⠋ 14/434  🎉 11 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠙ 15/434  🎉 12 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠹ 16/434  🎉 13 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠸ 17/434  🎉 14 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠼ 18/434  🎉 15 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠴ 19/434  🎉 16 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠦ 20/434  🎉 17 🫥 0  ⏰ 0  🤔 0  🙁 3  🔇 0  🧙 0⠧ 21/434  🎉 17 🫥 0  ⏰ 0  🤔 0  🙁 4  🔇 0  🧙 0⠇ 22/434  🎉 18 🫥 0  ⏰ 0  🤔 0  🙁 4  🔇 0  🧙 0⠏ 23/434  🎉 18 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠋ 24/434  🎉 19 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠙ 25/434  🎉 20 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠹ 26/434  🎉 21 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠸ 27/434  🎉 22 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠼ 28/434  🎉 23 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠴ 29/434  🎉 24 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠦ 30/434  🎉 25 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠧ 31/434  🎉 26 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠇ 32/434  🎉 27 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0⠏ 35/434  🎉 30 🫥 0  ⏰ 0  🤔 0  🙁 5  🔇 0  🧙 0
+35.92 mutations/second
+
+Mutant results
+--------------
+🎉 server.x__is_valid_pdf__mutmut_1
+🎉 server.x__is_valid_pdf__mutmut_10
+🎉 server.x__is_valid_pdf__mutmut_11
+🙁 server.x__is_valid_pdf__mutmut_12
+🙁 server.x__is_valid_pdf__mutmut_13
+🙁 server.x__is_valid_pdf__mutmut_14
+🎉 server.x__is_valid_pdf__mutmut_15
+🎉 server.x__is_valid_pdf__mutmut_16
+🎉 server.x__is_valid_pdf__mutmut_17
+🎉 server.x__is_valid_pdf__mutmut_18
+🎉 server.x__is_valid_pdf__mutmut_19
+🎉 server.x__is_valid_pdf__mutmut_2
+🎉 server.x__is_valid_pdf__mutmut_20
+🙁 server.x__is_valid_pdf__mutmut_21
+🎉 server.x__is_valid_pdf__mutmut_22
+🙁 server.x__is_valid_pdf__mutmut_23
+🎉 server.x__is_valid_pdf__mutmut_24
+🎉 server.x__is_valid_pdf__mutmut_25
+🎉 server.x__is_valid_pdf__mutmut_26
+🎉 server.x__is_valid_pdf__mutmut_27
+🎉 server.x__is_valid_pdf__mutmut_28
+🎉 server.x__is_valid_pdf__mutmut_29
+🎉 server.x__is_valid_pdf__mutmut_3
+🎉 server.x__is_valid_pdf__mutmut_30
+🎉 server.x__is_valid_pdf__mutmut_31
+🎉 server.x__is_valid_pdf__mutmut_32
+🎉 server.x__is_valid_pdf__mutmut_33
+🎉 server.x__is_valid_pdf__mutmut_34
+🎉 server.x__is_valid_pdf__mutmut_35
+🎉 server.x__is_valid_pdf__mutmut_4
+🎉 server.x__is_valid_pdf__mutmut_5
+🎉 server.x__is_valid_pdf__mutmut_6
+🎉 server.x__is_valid_pdf__mutmut_7
+🎉 server.x__is_valid_pdf__mutmut_8
+🎉 server.x__is_valid_pdf__mutmut_9
+
