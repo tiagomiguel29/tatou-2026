@@ -145,6 +145,8 @@ This endpoint uploads a PDF document to the server and registers its metadata.
 **Specification**
  * Requires authentication
  * The upload-pdf endpoint MUST accept only files in PDF format.
+ * Trailing whitespace is allowed; other data after the final PDF marker is rejected.
+ * Invalid uploads return HTTP 400 and are removed from storage.
 
 ## list-documents
 

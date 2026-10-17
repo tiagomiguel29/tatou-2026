@@ -33,9 +33,19 @@ def _is_valid_pdf(path: Path) -> bool:
             if stream.read(5) != b"%PDF-":
                 return False
             stream.seek(0, os.SEEK_END)
-            size = stream.tell()
-            stream.seek(max(0, size - 1024))
-            if re.search(rb"%%EOF[ \t\r\n]*\Z", stream.read()) is None:
+            end = stream.tell()
+            while end > 0:
+                start = max(0, end - 1024)
+                stream.seek(start)
+                tail = stream.read(end - start).rstrip(b" \t\r\n")
+                if tail:
+                    marker_end = start + len(tail)
+                    stream.seek(max(0, marker_end - 5))
+                    if stream.read(5) != b"%%EOF":
+                        return False
+                    break
+                end = start
+            else:
                 return False
 
         with pymupdf.open(str(path)) as document:
