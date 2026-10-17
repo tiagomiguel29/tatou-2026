@@ -67,4 +67,32 @@ def test_login_rejects_malformed_input():
             raise
         else:
             print(f"PASS: {case_name}")
+
+
+def test_protected_route_rejects_invalid_auth_headers():
+    client = app.test_client()
+    fuzz_cases = [
+        ("missing-header", None),
+        ("empty-header", ""),
+        ("wrong-scheme", "Basic dXNlcjpwYXNz"),
+        ("missing-bearer-token", "Bearer "),
+        ("malformed-bearer-token", "Bearer not-a-valid-token"),
+        ("oversized-bearer-token", "Bearer " + "A" * 4096),
+    ]
+
+    for case_name, auth_header in fuzz_cases:
+        headers = {} if auth_header is None else {"Authorization": auth_header}
+        resp = client.get("/api/list-documents", headers=headers)
+        print(f"{case_name}: {resp.get_data(as_text=True)}")
+
+        try:
+            assert resp.status_code == 401
+            assert resp.is_json
+            assert set(resp.json) == {"error"}
+            assert isinstance(resp.json["error"], str) and resp.json["error"]
+        except AssertionError:
+            print(f"FAIL: {case_name}")
+            raise
+        else:
+            print(f"PASS: {case_name}")
     
