@@ -97,16 +97,50 @@ def create_app():
         def wrapper(*args, **kwargs):
             auth = request.headers.get("Authorization", "")
             if not auth.startswith("Bearer "):
-                return _auth_error("Missing or invalid Authorization header")
+                app.logger.warning(
+                    "security_event=authentication_failed "
+                    "reason=missing_or_invalid_authorization_header "
+                    "endpoint=%s method=%s remote_addr=%s",
+                    request.path,
+                    request.method,
+                    request.remote_addr,
+                )
+                return _auth_error(
+                    "Missing or invalid Authorization header"
+                )
+
             token = auth.split(" ", 1)[1].strip()
             try:
-                data = _serializer().loads(token, max_age=app.config["TOKEN_TTL_SECONDS"])
+                data = _serializer().loads(
+                    token,
+                    max_age=app.config["TOKEN_TTL_SECONDS"],
+                )
             except SignatureExpired:
+                app.logger.warning(
+                    "security_event=authentication_failed "
+                    "reason=expired_token endpoint=%s method=%s remote_addr=%s",
+                    request.path,
+                    request.method,
+                    request.remote_addr,
+                )
                 return _auth_error("Token expired")
             except BadSignature:
+                app.logger.warning(
+                    "security_event=authentication_failed "
+                    "reason=invalid_token endpoint=%s method=%s remote_addr=%s",
+                    request.path,
+                    request.method,
+                    request.remote_addr,
+                )
                 return _auth_error("Invalid token")
-            g.user = {"id": int(data["uid"]), "login": data["login"], "email": data.get("email")}
+
+            g.user = {
+                "id": int(data["uid"]),
+                "login": data["login"],
+                "email": data.get("email"),
+            }
             return f(*args, **kwargs)
+
         return wrapper
 
     def _sha256_file(path: Path) -> str:
